@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-require 'yaml'
 require File.expand_path(File.dirname(__FILE__) + '/../lib/multiserver_whenever.rb')
 
 env = ARGV.shift || 'production'

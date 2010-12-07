@@ -2,4 +2,90 @@
 
 <em>Created by Chris Powers</em>
 
-Provides the multiserver_whenever command for generating host-specific crontabs with role-based whenever files. This is very handy for when you need to deploy different crontabs to different staging/production servers, but still want to leverage the <tt>whenever</tt> gem's DSL and build tools.
+Provides the <tt>multiserver_whenever</tt> command for generating host-specific 
+crontabs with role-based whenever files. This is very handy for when you need 
+to deploy different crontabs to different staging/production servers, but still 
+want to leverage the <tt>whenever</tt> gem's DSL and build tools.
+
+== Installation
+
+Just install the <tt>multiserver_whenever</tt> gem per usual:
+
+  gem install multiserver_whenever
+
+
+== Generating Document Structure with MultiserverWheneverize
+
+Taking off of the <tt>whenever</tt> gem's <tt>wheneverize</tt>, this gem provides 
+the <tt>multiserver_wheneverize</tt> command to generate the initial file structure:
+
+  cd /path/to/your_app
+  multiserver_wheneverize
+
+The generated file structure looks like:
+
+  - your_app/
+    - config/
+      - whenever.yml
+      - whenever/
+        - do_not_remove.rb
+        - example.rb
+
+
+== Configuration
+
+The <tt>config/whenever.yml</tt> file is a hash where the keys are server hostnames and
+the values are arrays of "roles".
+
+Let's say that I have two servers with hostnames <tt>app_server</tt> and <tt>db_server</tt>.
+I need to set app-related crontabs on <tt>app_server</tt>, db-related crontabs on
+<tt>db_server</tt> and some shared crontabs on both. To do this, I will first create three 
+whenever files in <tt>config/whenever</tt>:
+
+  - your_app/
+    - config/
+      - whenever.yml
+      - whenever/
+        - app.rb
+        - db.rb
+        - do_not_remove.rb
+        - shared.rb
+
+The contents of each of these files is regular <tt>whenever</tt> code (see https://github.com/javan/whenever).
+
+Then in our <tt>config/whenever.yml</tt> file we map our hostnames to the cron roles:
+
+  ---
+  app_server:
+    - app
+    - shared
+  db_server:
+    - db
+    - shared
+
+Now when you run the <tt>multiserver_whenever</tt> command on one of your servers, it will
+only apply the <tt>whenever</tt> files that are specified in your <tt>config/whenever.yml</tt>
+file.
+
+
+== Running <tt>multiserver_whenever</tt>
+
+If you are using the whenever <tt>rake</tt> and <tt>runner</tt> commands, you may need to
+specify a Rails environment. It defaults to using <tt>production</tt>, but you can simply
+pass a different environment to the <tt>multiserver_whenever</tt> command instead:
+
+  multiserver_whenever staging
+
+
+== Deployment with Capistrano
+
+In your Capistrano deployment code, you should be able to add something like this to run
+<tt>multiserver_whenever</tt> on deployment:
+
+  namespace :whenever do
+    desc "Update your whenever-generated crontabs"
+    task :update do
+      run "cd #{release_path}; multiserver_whenever #{rails_env}"
+    end
+    after "deploy:update", "whenever:update"
+  end
