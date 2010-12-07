@@ -1,0 +1,5 @@
+= Multiserver Whenever
+
+<em>Created by Chris Powers</em>
+
+Provides the multiserver_whenever command for generating host-specific crontabs with role-based whenever files. This is very handy for when you need to deploy different crontabs to different staging/production servers, but still want to leverage the <tt>whenever</tt> gem's DSL and build tools.
