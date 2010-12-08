@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'multiserver_whenever'
-  s.version = '0.1.0'
+  s.version = '0.1.1'
   s.author = 'Chris Powers'
   s.date = "2010-12-07"
   s.homepage = 'http://github.com/chrisjpowers/multiserver_whenever'

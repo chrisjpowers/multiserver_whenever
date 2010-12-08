@@ -1,21 +1,24 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
 
-describe MultiserverWhenever do
-  subject { MultiserverWhenever.new }
-  
+describe MultiserverWhenever do  
   let :cron_contents do
     <<-CRON
-# Begin Whenever generated tasks for: /path/to/project/config/whenever/search.rb
+# Begin Whenever generated tasks for: #{root_dir}/config/whenever/search.rb
 0 17 * * * /bin/bash -l -c 'echo '\''search'\'''
 
-# End Whenever generated tasks for: /path/to/project/config/whenever/search.rb
+# End Whenever generated tasks for: #{root_dir}/config/whenever/search.rb
 
 # Non-whenever crontab here
 
-# Begin Whenever generated tasks for: /path/to/project/config/whenever/emails.rb
+# Begin Whenever generated tasks for: /decoy/path/config/whenever/decoy.rb
+0 7 * * * /bin/bash -l -c 'echo '\''decoy'\'''
+
+# End Whenever generated tasks for: /decoy/path/config/whenever/decoy.rb
+
+# Begin Whenever generated tasks for: #{root_dir}/config/whenever/emails.rb
 0 7 * * * /bin/bash -l -c 'echo '\''emails'\'''
 
-# End Whenever generated tasks for: /path/to/project/config/whenever/emails.rb
+# End Whenever generated tasks for: #{root_dir}/config/whenever/emails.rb
 CRON
   end
   
@@ -62,8 +65,9 @@ CONFIG
     end
     
     it "should run whenever commands to clear the cron entries" do
-      subject.should_receive(:whenever).with("--load-file config/whenever/do_not_remove.rb --clear-crontab /path/to/project/config/whenever/search.rb --set environment=production")
-      subject.should_receive(:whenever).with("--load-file config/whenever/do_not_remove.rb --clear-crontab /path/to/project/config/whenever/emails.rb --set environment=production")
+      subject.should_receive(:whenever).with("--load-file config/whenever/do_not_remove.rb --clear-crontab #{root_dir}/config/whenever/search.rb --set environment=production")
+      subject.should_receive(:whenever).with("--load-file config/whenever/do_not_remove.rb --clear-crontab #{root_dir}/config/whenever/emails.rb --set environment=production")
+      subject.should_not_receive(:whenever).with("--load-file config/whenever/do_not_remove.rb --clear-crontab /decoy/path/config/whenever/decoy.rb --set environment=production")
       subject.clear!
     end
   end

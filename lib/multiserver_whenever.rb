@@ -60,9 +60,12 @@ class MultiserverWhenever
     "config/whenever/do_not_remove.rb"
   end
   
+  # Only worry about whenever blocks for this project
   def parse_identifiers
     lines = read_cron.split("\n")
-    lines = lines.select {|line| line =~ /^# Begin Whenever/ }
+    root_dir = Dir.pwd
+    puts "Root Dir is : #{root_dir}"
+    lines = lines.select {|line| line =~ /^# Begin Whenever generated tasks for: #{root_dir}/ }
     lines.map {|line| line.gsub("# Begin Whenever generated tasks for: ", '') }
   end
   
